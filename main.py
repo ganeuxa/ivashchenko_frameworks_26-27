@@ -1,9 +1,3 @@
-"""Система учёта расходных материалов: начальный сценарий (ПР1).
-
-Сценарий: оформление одной операции (приход или расход) по одному
-материалу на одном складе с проверкой остатка.
-"""
-
 from datetime import datetime
 
 OPERATION_RECEIPT = "1"
@@ -17,22 +11,18 @@ min_balance = 10
 
 
 def receive_material(current_balance, quantity):
-    """Оформляет приход: возвращает новый остаток."""
     return current_balance + quantity
 
 
 def can_write_off(current_balance, quantity):
-    """Проверяет, хватает ли остатка для списания."""
     return quantity <= current_balance
 
 
 def write_off_material(current_balance, quantity):
-    """Оформляет расход: возвращает новый остаток."""
     return current_balance - quantity
 
 
 def get_stock_status(current_balance, minimum):
-    """Возвращает текстовый статус остатка относительно минимума."""
     if current_balance == 0:
         return "Материал закончился, требуется срочный дозаказ"
     elif current_balance < minimum:
@@ -41,7 +31,6 @@ def get_stock_status(current_balance, minimum):
 
 
 def parse_quantity(raw_value):
-    """Преобразует введённую строку в количество; 0 при неверном вводе."""
     raw_value = raw_value.strip()
     if raw_value.isdigit():
         return int(raw_value)
