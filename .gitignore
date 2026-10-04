@@ -1,0 +1,30 @@
+# Виртуальное окружение
+.venv/
+venv/
+env/
+
+# Кэш Python
+__pycache__/
+*.py[cod]
+
+# Тесты и проверки
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Переменные окружения
+.env
+
+# Django (на будущее)
+db.sqlite3
+media/
+staticfiles/
+
+# IDE
+.idea/
+.vscode/
+.claude/
+
+# ОС
+.DS_Store
+Thumbs.db
