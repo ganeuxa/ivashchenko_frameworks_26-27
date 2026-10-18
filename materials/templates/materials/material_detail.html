@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if material %}
+        {{ material.name }} – Учёт материалов
+    {% else %}
+        Материал не найден – Учёт материалов
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if material %}
+        <div class="card mb-4">
+            <div class="card-body">
+                <h1 class="card-title h3">{{ material.name }}</h1>
+                <p class="card-text">Номер: {{ material.id }}</p>
+                <p class="card-text">Единица измерения: {{ material.unit }}</p>
+                <p class="card-text">
+                    Минимальный остаток: {{ material.min_balance }} {{ material.unit }}
+                </p>
+                <p class="card-text">
+                    Всего на складах: <strong>{{ total }} {{ material.unit }}</strong>
+                    {% include "includes/stock_badge.html" %}
+                </p>
+                <p class="card-text text-muted">{{ status }}</p>
+            </div>
+        </div>
+
+        <h2 class="h5">По складам</h2>
+        <ul class="list-group mb-4">
+            {% for item in stock_items %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <a href="{% url 'warehouses:detail' item.warehouse.id %}">
+                        {{ item.warehouse.name }}
+                    </a>
+                    <span>{{ item.quantity }} {{ material.unit }}</span>
+                </li>
+            {% empty %}
+                <li class="list-group-item">Ни на одном складе нет.</li>
+            {% endfor %}
+        </ul>
+
+        <h2 class="h5">Операции ({{ operations|length }})</h2>
+        <ul class="list-group mb-4">
+            {% for operation in operations %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <a href="{% url 'operations:detail' operation.id %}">
+                        {{ operation.performed_at|date:"d.m.Y H:i" }},
+                        {{ operation.title|lower }} {{ operation.quantity }}
+                        {{ material.unit }}
+                    </a>
+                    {% include "operations/includes/operation_status.html" %}
+                </li>
+            {% empty %}
+                <li class="list-group-item">Операций нет.</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <h1 class="text-danger">Материал не найден</h1>
+        <p>Материала с таким номером нет.</p>
+    {% endif %}
+
+    <a href="{% url 'materials:list' %}" class="btn btn-outline-secondary">
+        ← к списку материалов
+    </a>
+{% endblock %}

@@ -4,5 +4,6 @@
     {"id": 3, "type": "receipt", "material_id": 2, "warehouse_id": 1, "target_warehouse_id": null, "quantity": 2, "date": "2026-09-03 14:00", "is_cancelled": false},
     {"id": 4, "type": "receipt", "material_id": 3, "warehouse_id": 1, "target_warehouse_id": null, "quantity": 120, "date": "2026-09-05 09:30", "is_cancelled": false},
     {"id": 5, "type": "receipt", "material_id": 4, "warehouse_id": 2, "target_warehouse_id": null, "quantity": 8, "date": "2026-09-10 11:45", "is_cancelled": false},
-    {"id": 6, "type": "receipt", "material_id": 5, "warehouse_id": 1, "target_warehouse_id": null, "quantity": 12, "date": "2026-09-12 16:10", "is_cancelled": false}
+    {"id": 6, "type": "receipt", "material_id": 5, "warehouse_id": 1, "target_warehouse_id": null, "quantity": 12, "date": "2026-09-12 16:10", "is_cancelled": false},
+    {"id": 7, "type": "write_off", "material_id": 1, "warehouse_id": 1, "target_warehouse_id": null, "quantity": 5, "date": "2026-09-15 12:00", "is_cancelled": true}
 ]

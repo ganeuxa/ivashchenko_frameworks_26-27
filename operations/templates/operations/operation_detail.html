@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if operation %}
+        {{ operation.title }} №{{ operation.id }} – Учёт материалов
+    {% else %}
+        Операция не найдена – Учёт материалов
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if operation %}
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title h3">
+                    {{ operation.title }} №{{ operation.id }}
+                    {% include "operations/includes/operation_status.html" %}
+                </h1>
+                <p class="card-text">
+                    Дата: {{ operation.performed_at|date:"d.m.Y, H:i" }}
+                </p>
+                <p class="card-text">
+                    Материал:
+                    <a href="{% url 'materials:detail' operation.material.id %}">
+                        {{ operation.material.name }}
+                    </a>
+                </p>
+                <p class="card-text">
+                    Количество: {{ operation.quantity }} {{ operation.material.unit }}
+                </p>
+                <p class="card-text">
+                    Склад:
+                    <a href="{% url 'warehouses:detail' operation.warehouse.id %}">
+                        {{ operation.warehouse.name }}
+                    </a>
+                    {% if operation.target_warehouse %}
+                        →
+                        <a href="{% url 'warehouses:detail' operation.target_warehouse.id %}">
+                            {{ operation.target_warehouse.name }}
+                        </a>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    {% else %}
+        <h1 class="text-danger">Операция не найдена</h1>
+        <p>Операции с таким номером нет.</p>
+    {% endif %}
+
+    <a href="{% url 'operations:list' %}" class="btn btn-outline-secondary mt-3">
+        ← к истории операций
+    </a>
+{% endblock %}

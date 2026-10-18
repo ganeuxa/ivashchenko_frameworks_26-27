@@ -1,0 +1,14 @@
+<a
+    href="{% url 'warehouses:detail' row.warehouse.id %}"
+    class="list-group-item list-group-item-action d-flex justify-content-between"
+>
+    <div>
+        <div class="fw-semibold">{{ row.warehouse.name }}</div>
+        <div class="text-muted small">
+            {{ row.warehouse.location|default:"адрес не указан" }}
+        </div>
+    </div>
+    <span class="badge bg-primary align-self-center">
+        позиций: {{ row.positions }}
+    </span>
+</a>

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Склады – Учёт материалов{% endblock %}
+
+{% block content %}
+    <h1>Склады</h1>
+    <p class="text-muted">Всего складов: {{ rows|length }}</p>
+
+    <div class="list-group">
+        {% for row in rows %}
+            {% include "warehouses/includes/warehouse_item.html" %}
+        {% empty %}
+            <p>Складов пока нет.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

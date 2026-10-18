@@ -1,0 +1,7 @@
+{% if level == "empty" %}
+    <span class="badge bg-danger stock-badge">закончился</span>
+{% elif level == "low" %}
+    <span class="badge bg-warning text-dark stock-badge">ниже минимума</span>
+{% else %}
+    <span class="badge bg-success stock-badge">в норме</span>
+{% endif %}

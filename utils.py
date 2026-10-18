@@ -1,6 +1,8 @@
 from collections.abc import Iterable
 from datetime import datetime
 
+DATE_FORMAT = "%Y-%m-%d %H:%M"
+
 
 def input_int(prompt: str, min_value: int = 1) -> int:
     """Спрашивает целое число, пока не введут правильное."""
@@ -33,4 +35,4 @@ def next_id(ids: Iterable[int]) -> int:
 
 def now_str() -> str:
     """Текущие дата и время строкой."""
-    return datetime.now().strftime("%Y-%m-%d %H:%M")
+    return datetime.now().strftime(DATE_FORMAT)

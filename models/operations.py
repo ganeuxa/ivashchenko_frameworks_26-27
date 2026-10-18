@@ -1,4 +1,6 @@
-from utils import next_id, now_str
+from datetime import datetime
+
+from utils import DATE_FORMAT, next_id, now_str
 
 from .materials import Material
 from .stock import StockItem, get_stock_item
@@ -48,6 +50,11 @@ class Operation:
             raise ValueError(f"Операция №{self.id} уже отменена")
         self.revert(stock)
         self.is_cancelled = True
+
+    @property
+    def performed_at(self) -> datetime:
+        """Дата операции как datetime, чтобы её можно было форматировать."""
+        return datetime.strptime(self.date, DATE_FORMAT)
 
     def place(self) -> str:
         """Где прошла операция."""

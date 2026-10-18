@@ -1,0 +1,22 @@
+<div class="col-md-6 col-lg-4">
+    <article class="card material-card level-{{ row.level }}">
+        <div class="card-body">
+            <h2 class="h5 card-title">
+                {{ row.material.name|default:"Без названия" }}
+            </h2>
+            <p class="card-text mb-1">
+                Остаток: <strong>{{ row.total }} {{ row.material.unit }}</strong>
+            </p>
+            <p class="card-text text-muted">
+                Минимум: {{ row.material.min_balance }} {{ row.material.unit }}
+            </p>
+            {% include "includes/stock_badge.html" with level=row.level %}
+            <a
+                href="{% url 'materials:detail' row.material.id %}"
+                class="btn btn-sm btn-outline-primary float-end"
+            >
+                Подробнее
+            </a>
+        </div>
+    </article>
+</div>

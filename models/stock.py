@@ -105,6 +105,15 @@ def get_warehouse_stock(
     ]
 
 
+def get_stock_level(current_balance: int, minimum: int) -> str:
+    """Уровень остатка: empty, low или ok."""
+    if current_balance == 0:
+        return "empty"
+    elif current_balance < minimum:
+        return "low"
+    return "ok"
+
+
 def get_stock_status(current_balance: int, minimum: int) -> str:
     """Текстовый статус остатка относительно минимума."""
     if current_balance == 0:

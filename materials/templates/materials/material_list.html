@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Материалы – Учёт материалов{% endblock %}
+
+{% block content %}
+    <h1>Материалы</h1>
+    <p class="text-muted">Всего материалов: {{ rows|length }}</p>
+
+    <div class="row g-3">
+        {% for row in rows %}
+            {% include "materials/includes/material_card.html" %}
+        {% empty %}
+            <p>Материалов пока нет.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

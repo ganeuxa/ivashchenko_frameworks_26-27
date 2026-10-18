@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if warehouse %}
+        {{ warehouse.name }} – Учёт материалов
+    {% else %}
+        Склад не найден – Учёт материалов
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if warehouse %}
+        <h1>{{ warehouse.name }}</h1>
+        <p class="text-muted">{{ warehouse.location }}</p>
+
+        <table class="table bg-white">
+            <thead>
+                <tr><th>Материал</th><th>На складе</th><th>Общий статус</th></tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'materials:detail' row.item.material.id %}">
+                                {{ row.item.material.name }}
+                            </a>
+                        </td>
+                        <td>{{ row.item.quantity }} {{ row.item.material.unit }}</td>
+                        <td>{% include "includes/stock_badge.html" with level=row.level %}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="3">Склад пустой.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <h1 class="text-danger">Склад не найден</h1>
+        <p>Склада с таким номером нет.</p>
+    {% endif %}
+
+    <a href="{% url 'warehouses:list' %}" class="btn btn-outline-secondary">
+        ← к списку складов
+    </a>
+{% endblock %}
