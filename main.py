@@ -1,37 +1,48 @@
-from materials import (
+from collections.abc import Callable
+from functools import wraps
+
+from models import Material, Warehouse
+from models.materials import (
     add_material,
+    find_material_by_id,
     find_materials,
-    get_material,
     sort_materials,
 )
-from operations import (
-    OPERATION_NAMES,
+from models.operations import (
     cancel_operation,
     receive_material,
     transfer_material,
     write_off_material,
 )
-from stock import (
+from models.stock import (
     get_balance,
     get_stock_status,
     get_total_balance,
     get_warehouse_stock,
     low_stock_materials,
 )
+from models.warehouses import add_warehouse, find_warehouse_by_id
 from storage import load_data, save_data
 from utils import input_int, input_text
-from warehouses import add_warehouse, get_warehouse
 
 
-def print_materials_table(data: dict, materials: dict[int, dict]) -> None:
+def saves_data(action: Callable[..., None]) -> Callable[..., None]:
+    """Декоратор: после успешного действия сохраняет данные."""
+    @wraps(action)
+    def wrapper(data: dict, *args, **kwargs) -> None:
+        action(data, *args, **kwargs)
+        save_data(data)
+    return wrapper
+
+
+def print_materials_table(data: dict, materials: list[Material]) -> None:
     """Выводит таблицу материалов с общим остатком."""
     print(f"{'№':>3}  {'Название':<30}{'Остаток':>12}  Статус")
-    for material_id, material in sort_materials(materials):
-        total = get_total_balance(data["stock"], material_id)
-        status = get_stock_status(total, material["min_balance"])
-        amount = f"{total} {material['unit']}"
-        name = material["name"]
-        print(f"{material_id:>3}  {name:<30}{amount:>12}  {status}")
+    for material in sort_materials(materials):
+        total = get_total_balance(data["stock"], material)
+        status = get_stock_status(total, material.min_balance)
+        amount = f"{total} {material.unit}"
+        print(f"{material.id:>3}  {material.name:<30}{amount:>12}  {status}")
 
 
 def show_materials(data: dict) -> None:
@@ -52,14 +63,14 @@ def search_materials(data: dict) -> None:
     print_materials_table(data, found)
 
 
+@saves_data
 def create_material(data: dict) -> None:
     """Добавляет новый материал."""
     name = input_text("Название: ")
     unit = input_text("Единица измерения (шт, пачка, л...): ")
     min_balance = input_int("Минимальный остаток: ", min_value=0)
-    material_id = add_material(data["materials"], name, unit, min_balance)
-    save_data(data)
-    print(f"Материал добавлен под номером {material_id}")
+    material = add_material(data["materials"], name, unit, min_balance)
+    print(f"Материал добавлен под номером {material.id}")
 
 
 def show_warehouses(data: dict) -> None:
@@ -67,102 +78,99 @@ def show_warehouses(data: dict) -> None:
     if not data["warehouses"]:
         print("Складов пока нет")
         return
-    for warehouse_id, warehouse in data["warehouses"].items():
-        positions = len(get_warehouse_stock(data["stock"], warehouse_id))
-        print(
-            f"{warehouse_id:>3}  {warehouse['name']:<20}"
-            f"{warehouse['location']:<25}позиций: {positions}"
-        )
+    for warehouse in data["warehouses"]:
+        positions = len(get_warehouse_stock(data["stock"], warehouse))
+        print(f"{warehouse.id:>3}  {warehouse}, позиций: {positions}")
 
 
+@saves_data
 def create_warehouse(data: dict) -> None:
     """Добавляет новый склад."""
     name = input_text("Название склада: ")
     location = input_text("Где находится: ")
-    warehouse_id = add_warehouse(data["warehouses"], name, location)
-    save_data(data)
-    print(f"Склад добавлен под номером {warehouse_id}")
+    warehouse = add_warehouse(data["warehouses"], name, location)
+    print(f"Склад добавлен под номером {warehouse.id}")
 
 
-def choose_material(data: dict) -> int:
+def choose_material(data: dict) -> Material:
     """Просит выбрать материал по номеру."""
-    for material_id, material in sort_materials(data["materials"]):
-        print(f"  {material_id}. {material['name']}")
-    material_id = input_int("Номер материала: ")
-    get_material(data["materials"], material_id)
-    return material_id
+    for material in sort_materials(data["materials"]):
+        print(f"  {material.id}. {material.name}")
+    return find_material_by_id(
+        data["materials"], input_int("Номер материала: ")
+    )
 
 
-def choose_warehouse(data: dict, prompt: str = "Номер склада: ") -> int:
+def choose_warehouse(data: dict, prompt: str = "Номер склада: ") -> Warehouse:
     """Просит выбрать склад по номеру."""
-    for warehouse_id, warehouse in data["warehouses"].items():
-        print(f"  {warehouse_id}. {warehouse['name']}")
-    warehouse_id = input_int(prompt)
-    get_warehouse(data["warehouses"], warehouse_id)
-    return warehouse_id
+    for warehouse in data["warehouses"]:
+        print(f"  {warehouse.id}. {warehouse.name}")
+    return find_warehouse_by_id(data["warehouses"], input_int(prompt))
 
 
 def show_warehouse_stock(data: dict) -> None:
     """Показывает, что лежит на выбранном складе."""
-    warehouse_id = choose_warehouse(data)
-    items = get_warehouse_stock(data["stock"], warehouse_id)
+    warehouse = choose_warehouse(data)
+    items = get_warehouse_stock(data["stock"], warehouse)
     if not items:
         print("Склад пустой")
         return
-    for material_id, quantity in items.items():
-        material = data["materials"][material_id]
-        print(f"  {material['name']:<30}{quantity} {material['unit']}")
+    for item in items:
+        print(f"  {item}")
 
 
-def print_balance(data: dict, material_id: int, warehouse_id: int) -> None:
+def print_balance(
+    data: dict,
+    material: Material,
+    warehouse: Warehouse,
+) -> None:
     """Выводит остаток после операции."""
-    material = data["materials"][material_id]
-    unit = material["unit"]
-    balance = get_balance(data["stock"], material_id, warehouse_id)
-    total = get_total_balance(data["stock"], material_id)
+    balance = get_balance(data["stock"], material, warehouse)
+    total = get_total_balance(data["stock"], material)
+    unit = material.unit
     print(f"Остаток на складе: {balance} {unit}, всего: {total} {unit}")
-    print(f"Статус: {get_stock_status(total, material['min_balance'])}")
+    print(f"Статус: {get_stock_status(total, material.min_balance)}")
 
 
+@saves_data
 def receive(data: dict) -> None:
     """Оформляет приход."""
-    material_id = choose_material(data)
-    warehouse_id = choose_warehouse(data)
+    material = choose_material(data)
+    warehouse = choose_warehouse(data)
     quantity = input_int("Количество: ")
     receive_material(
-        data["stock"], data["operations"], material_id, warehouse_id, quantity
+        data["stock"], data["operations"], material, warehouse, quantity
     )
-    save_data(data)
     print("Приход оформлен")
-    print_balance(data, material_id, warehouse_id)
+    print_balance(data, material, warehouse)
 
 
+@saves_data
 def write_off(data: dict) -> None:
     """Оформляет расход."""
-    material_id = choose_material(data)
-    warehouse_id = choose_warehouse(data)
+    material = choose_material(data)
+    warehouse = choose_warehouse(data)
     quantity = input_int("Количество: ")
     write_off_material(
-        data["stock"], data["operations"], material_id, warehouse_id, quantity
+        data["stock"], data["operations"], material, warehouse, quantity
     )
-    save_data(data)
     print("Расход оформлен")
-    print_balance(data, material_id, warehouse_id)
+    print_balance(data, material, warehouse)
 
 
+@saves_data
 def transfer(data: dict) -> None:
     """Перемещает материал между складами."""
-    material_id = choose_material(data)
-    from_id = choose_warehouse(data, "Со склада: ")
-    to_id = choose_warehouse(data, "На склад: ")
+    material = choose_material(data)
+    from_warehouse = choose_warehouse(data, "Со склада: ")
+    to_warehouse = choose_warehouse(data, "На склад: ")
     quantity = input_int("Количество: ")
     transfer_material(
-        data["stock"], data["operations"], material_id, from_id, to_id,
-        quantity,
+        data["stock"], data["operations"], material,
+        from_warehouse, to_warehouse, quantity,
     )
-    save_data(data)
     print("Перемещение оформлено")
-    print_balance(data, material_id, to_id)
+    print_balance(data, material, to_warehouse)
 
 
 def show_operations(data: dict) -> None:
@@ -171,22 +179,10 @@ def show_operations(data: dict) -> None:
         print("Операций пока нет")
         return
     for operation in data["operations"]:
-        material = data["materials"].get(operation["material_id"], {})
-        warehouse = data["warehouses"].get(operation["warehouse_id"], {})
-        place = warehouse.get("name", "?")
-        if operation["type"] == "transfer":
-            target = data["warehouses"].get(
-                operation["target_warehouse_id"], {}
-            )
-            place = f"{place} -> {target.get('name', '?')}"
-        print(
-            f"{operation['id']:>3}  {operation['date']}  "
-            f"{OPERATION_NAMES.get(operation['type'], '?'):<13}"
-            f"{material.get('name', '?'):<30}"
-            f"{operation['quantity']:>6}  {place}"
-        )
+        print(f"  {operation}")
 
 
+@saves_data
 def cancel(data: dict) -> None:
     """Отменяет операцию по номеру."""
     show_operations(data)
@@ -194,21 +190,19 @@ def cancel(data: dict) -> None:
         return
     operation_id = input_int("Номер операции для отмены: ")
     cancel_operation(data["stock"], data["operations"], operation_id)
-    save_data(data)
     print("Операция отменена, остатки пересчитаны")
 
 
 def show_low_stock(data: dict) -> None:
     """Показывает материалы, которые пора дозаказать."""
     found = False
-    for material_id, material, total in low_stock_materials(
+    for material, total in low_stock_materials(
         data["materials"], data["stock"]
     ):
         found = True
         print(
-            f"{material_id:>3}  {material['name']:<30}"
-            f"есть {total}, минимум {material['min_balance']} "
-            f"{material['unit']}"
+            f"{material.id:>3}  {material.name:<30}"
+            f"есть {total}, минимум {material.min_balance} {material.unit}"
         )
     if not found:
         print("Всё в норме, дозаказывать ничего не нужно")
