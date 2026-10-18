@@ -4,8 +4,8 @@ from functools import wraps
 from models import Material, Warehouse
 from models.materials import (
     add_material,
-    find_material_by_id,
     find_materials,
+    get_material_by_id,
     sort_materials,
 )
 from models.operations import (
@@ -21,7 +21,7 @@ from models.stock import (
     get_warehouse_stock,
     low_stock_materials,
 )
-from models.warehouses import add_warehouse, find_warehouse_by_id
+from models.warehouses import add_warehouse, get_warehouse_by_id
 from storage import load_data, save_data
 from utils import input_int, input_text
 
@@ -96,7 +96,7 @@ def choose_material(data: dict) -> Material:
     """Просит выбрать материал по номеру."""
     for material in sort_materials(data["materials"]):
         print(f"  {material.id}. {material.name}")
-    return find_material_by_id(
+    return get_material_by_id(
         data["materials"], input_int("Номер материала: ")
     )
 
@@ -105,7 +105,7 @@ def choose_warehouse(data: dict, prompt: str = "Номер склада: ") -> W
     """Просит выбрать склад по номеру."""
     for warehouse in data["warehouses"]:
         print(f"  {warehouse.id}. {warehouse.name}")
-    return find_warehouse_by_id(data["warehouses"], input_int(prompt))
+    return get_warehouse_by_id(data["warehouses"], input_int(prompt))
 
 
 def show_warehouse_stock(data: dict) -> None:

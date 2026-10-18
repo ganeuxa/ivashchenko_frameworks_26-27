@@ -215,15 +215,26 @@ def transfer_material(
     return register_operation(stock, operations, operation)
 
 
-def find_operation(
+def find_operation_by_id(
     operations: list[Operation],
     operation_id: int,
-) -> Operation:
-    """Возвращает операцию по номеру."""
+) -> Operation | None:
+    """Ищет операцию по номеру, если нет, возвращает None."""
     for operation in operations:
         if operation.id == operation_id:
             return operation
-    raise ValueError(f"Операции с номером {operation_id} нет")
+    return None
+
+
+def get_material_operations(
+    operations: list[Operation],
+    material: Material,
+) -> list[Operation]:
+    """Операции по одному материалу."""
+    return [
+        operation for operation in operations
+        if operation.material is material
+    ]
 
 
 def cancel_operation(
@@ -232,6 +243,8 @@ def cancel_operation(
     operation_id: int,
 ) -> Operation:
     """Находит операцию и отменяет её."""
-    operation = find_operation(operations, operation_id)
+    operation = find_operation_by_id(operations, operation_id)
+    if operation is None:
+        raise ValueError(f"Операции с номером {operation_id} нет")
     operation.cancel(stock)
     return operation

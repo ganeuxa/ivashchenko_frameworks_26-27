@@ -4,9 +4,9 @@ from pathlib import Path
 from typing import TypeVar
 
 from models import Material, Operation, StockItem, Transfer, Warehouse
-from models.materials import find_material_by_id
+from models.materials import get_material_by_id
 from models.operations import OPERATION_CLASSES
-from models.warehouses import find_warehouse_by_id
+from models.warehouses import get_warehouse_by_id
 
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -85,8 +85,8 @@ def load_stock(
     """Загружает остатки и связывает их с материалами и складами."""
     def build(record: dict) -> StockItem:
         return StockItem(
-            find_material_by_id(materials, record["material_id"]),
-            find_warehouse_by_id(warehouses, record["warehouse_id"]),
+            get_material_by_id(materials, record["material_id"]),
+            get_warehouse_by_id(warehouses, record["warehouse_id"]),
             record["quantity"],
         )
 
@@ -103,11 +103,11 @@ def load_operations(
         operation_class = OPERATION_CLASSES.get(record["type"])
         if operation_class is None:
             raise ValueError(f"неизвестный тип операции {record['type']}")
-        material = find_material_by_id(materials, record["material_id"])
-        warehouse = find_warehouse_by_id(warehouses, record["warehouse_id"])
+        material = get_material_by_id(materials, record["material_id"])
+        warehouse = get_warehouse_by_id(warehouses, record["warehouse_id"])
         is_cancelled = record.get("is_cancelled", False)
         if operation_class is Transfer:
-            target = find_warehouse_by_id(
+            target = get_warehouse_by_id(
                 warehouses, record.get("target_warehouse_id")
             )
             return Transfer(

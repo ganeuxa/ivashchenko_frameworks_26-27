@@ -41,9 +41,20 @@ def add_warehouse(
 def find_warehouse_by_id(
     warehouses: list[Warehouse],
     warehouse_id: int,
-) -> Warehouse:
-    """Возвращает склад по номеру."""
+) -> Warehouse | None:
+    """Ищет склад по номеру, если нет, возвращает None."""
     for warehouse in warehouses:
         if warehouse.id == warehouse_id:
             return warehouse
-    raise ValueError(f"Склада с номером {warehouse_id} нет")
+    return None
+
+
+def get_warehouse_by_id(
+    warehouses: list[Warehouse],
+    warehouse_id: int,
+) -> Warehouse:
+    """Возвращает склад по номеру или выдаёт ошибку."""
+    warehouse = find_warehouse_by_id(warehouses, warehouse_id)
+    if warehouse is None:
+        raise ValueError(f"Склада с номером {warehouse_id} нет")
+    return warehouse

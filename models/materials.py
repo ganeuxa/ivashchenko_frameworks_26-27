@@ -68,12 +68,23 @@ def add_material(
 def find_material_by_id(
     materials: list[Material],
     material_id: int,
-) -> Material:
-    """Возвращает материал по номеру."""
+) -> Material | None:
+    """Ищет материал по номеру, если нет, возвращает None."""
     for material in materials:
         if material.id == material_id:
             return material
-    raise ValueError(f"Материала с номером {material_id} нет")
+    return None
+
+
+def get_material_by_id(
+    materials: list[Material],
+    material_id: int,
+) -> Material:
+    """Возвращает материал по номеру или выдаёт ошибку."""
+    material = find_material_by_id(materials, material_id)
+    if material is None:
+        raise ValueError(f"Материала с номером {material_id} нет")
+    return material
 
 
 def find_materials(materials: list[Material], query: str) -> list[Material]:

@@ -5,6 +5,7 @@ from models.materials import (
     add_material,
     find_material_by_id,
     find_materials,
+    get_material_by_id,
     sort_materials,
 )
 
@@ -65,8 +66,9 @@ def test_find_material_by_id():
     materials = []
     paper = add_material(materials, "Бумага А4", "пачка", 10)
     assert find_material_by_id(materials, 1) is paper
+    assert find_material_by_id(materials, 99) is None
     with pytest.raises(ValueError):
-        find_material_by_id(materials, 99)
+        get_material_by_id(materials, 99)
 
 
 def test_sort_materials_by_name():
