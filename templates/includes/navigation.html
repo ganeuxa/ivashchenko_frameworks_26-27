@@ -1,18 +1,25 @@
 {% load static %}
-<nav class="navbar navbar-expand navbar-dark site-nav mb-4">
-    <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="{% url 'homepage:index' %}">
-            <img
-                src="{% static 'homepage/img/logo.svg' %}"
-                alt="Логотип"
-                class="site-logo"
-            >
+{% with section=request.resolver_match.app_name %}
+<header class="site-header">
+    <div class="site-header-inner">
+        <a class="site-brand" href="{% url 'homepage:index' %}">
+            <img src="{% static 'homepage/img/logo.svg' %}" alt="" class="site-logo">
             Учёт материалов
         </a>
-        <div class="navbar-nav">
-            <a class="nav-link" href="{% url 'materials:list' %}">Материалы</a>
-            <a class="nav-link" href="{% url 'warehouses:list' %}">Склады</a>
-            <a class="nav-link" href="{% url 'operations:list' %}">Операции</a>
-        </div>
+        <nav class="site-nav" aria-label="Разделы">
+            <a
+                href="{% url 'materials:list' %}"
+                {% if section == "materials" %}aria-current="page"{% endif %}
+            >Материалы</a>
+            <a
+                href="{% url 'warehouses:list' %}"
+                {% if section == "warehouses" %}aria-current="page"{% endif %}
+            >Склады</a>
+            <a
+                href="{% url 'operations:list' %}"
+                {% if section == "operations" %}aria-current="page"{% endif %}
+            >Операции</a>
+        </nav>
     </div>
-</nav>
+</header>
+{% endwith %}

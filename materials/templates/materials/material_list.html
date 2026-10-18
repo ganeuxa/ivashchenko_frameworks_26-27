@@ -4,13 +4,18 @@
 
 {% block content %}
     <h1>Материалы</h1>
-    <p class="text-muted">Всего материалов: {{ rows|length }}</p>
+    <p class="lead-line">
+        Всего материалов: {{ rows|length }}. Полоса показывает общий остаток
+        на всех складах, тёмная засечка отмечает минимум.
+    </p>
 
-    <div class="row g-3">
+    <ul class="ledger mt-4">
         {% for row in rows %}
-            {% include "materials/includes/material_card.html" %}
+            {% include "materials/includes/material_row.html" %}
         {% empty %}
-            <p>Материалов пока нет.</p>
+            <li class="ledger-empty">
+                Материалов пока нет. Добавить их можно в консольной версии.
+            </li>
         {% endfor %}
-    </div>
+    </ul>
 {% endblock %}

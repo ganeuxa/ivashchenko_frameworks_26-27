@@ -3,7 +3,13 @@
 {% block title %}Страница не найдена – Учёт материалов{% endblock %}
 
 {% block content %}
-    <h1 class="text-danger">404: страница не найдена</h1>
-    <p>Проверьте адрес или вернитесь на главную.</p>
-    <a href="{% url 'homepage:index' %}" class="btn btn-primary">На главную</a>
+    <h1>Страница не найдена</h1>
+    <p class="lead-line">
+        По этому адресу ничего нет. Скорее всего, в адресе опечатка.
+        Начните с главной или откройте список материалов.
+    </p>
+    <div class="quick-links">
+        <a href="{% url 'homepage:index' %}">На главную</a>
+        <a href="{% url 'materials:list' %}">Все материалы</a>
+    </div>
 {% endblock %}

@@ -4,39 +4,49 @@
 
 {% block content %}
     <h1>Операции</h1>
-    <div class="d-flex justify-content-between align-items-center mb-2">
-        <span class="text-muted">Всего операций: {{ operations|length }}</span>
-        <label class="form-check">
+    <p class="lead-line">
+        Приходы, расходы и перемещения, новые сверху. Отменённая операция
+        остаётся в истории, но на остатки уже не влияет.
+    </p>
+
+    <div class="sheet-tools mt-4">
+        <span>Всего операций: {{ operations|length }}</span>
+        <label>
             <input type="checkbox" class="form-check-input" id="hide-cancelled">
-            скрыть отменённые
+            Скрыть отменённые
         </label>
     </div>
 
-    <table class="table table-hover bg-white">
-        <thead>
-            <tr>
-                <th>№</th><th>Дата</th><th>Тип</th><th>Материал</th>
-                <th>Количество</th><th>Склад</th><th>Статус</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for operation in operations %}
-                <tr{% if operation.is_cancelled %} class="operation-cancelled"{% endif %}>
-                    <td>
-                        <a href="{% url 'operations:detail' operation.id %}">
-                            {{ operation.id }}
-                        </a>
-                    </td>
-                    <td>{{ operation.performed_at|date:"d.m.Y H:i" }}</td>
-                    <td>{{ operation.title }}</td>
-                    <td>{{ operation.material.name }}</td>
-                    <td>{{ operation.quantity }} {{ operation.material.unit }}</td>
-                    <td>{{ operation.place }}</td>
-                    <td>{% include "operations/includes/operation_status.html" %}</td>
+    <div class="table-wrap">
+        <table class="sheet">
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Дата</th>
+                    <th>Операция</th>
+                    <th>Материал</th>
+                    <th>Склад</th>
+                    <th class="right">Количество</th>
+                    <th class="right">Статус</th>
                 </tr>
-            {% empty %}
-                <tr><td colspan="7">Операций пока нет.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for operation in operations %}
+                    <tr class="op-{{ operation.operation_type }}{% if operation.is_cancelled %} operation-cancelled{% endif %}">
+                        <td class="num">
+                            <a href="{% url 'operations:detail' operation.id %}">{{ operation.id }}</a>
+                        </td>
+                        <td class="num">{{ operation.performed_at|date:"d.m.Y H:i" }}</td>
+                        <td>{{ operation.title }}</td>
+                        <td class="op-material">{{ operation.material.name }}</td>
+                        <td>{{ operation.place }}</td>
+                        <td class="right">{% include "operations/includes/operation_qty.html" %}</td>
+                        <td class="right">{% include "operations/includes/operation_status.html" %}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7">Операций пока нет.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

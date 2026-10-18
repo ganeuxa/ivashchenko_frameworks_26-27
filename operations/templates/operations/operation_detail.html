@@ -9,45 +9,61 @@
 {% endblock %}
 
 {% block content %}
+    <nav class="crumbs" aria-label="Путь">
+        <a href="{% url 'operations:list' %}">Операции</a>
+        / №{% if operation %}{{ operation.id }}{% else %}{{ operation_id }}{% endif %}
+    </nav>
+
     {% if operation %}
-        <div class="card">
-            <div class="card-body">
-                <h1 class="card-title h3">
-                    {{ operation.title }} №{{ operation.id }}
-                    {% include "operations/includes/operation_status.html" %}
-                </h1>
-                <p class="card-text">
-                    Дата: {{ operation.performed_at|date:"d.m.Y, H:i" }}
-                </p>
-                <p class="card-text">
-                    Материал:
+        <h1>{{ operation.title }} №{{ operation.id }}</h1>
+
+        <section class="panel mt-3 op-{{ operation.operation_type }}{% if operation.is_cancelled %} operation-cancelled{% endif %}">
+            <div class="stock-head">
+                <strong>{% include "operations/includes/operation_qty.html" %}</strong>
+                {% include "operations/includes/operation_status.html" %}
+            </div>
+            <dl class="facts">
+                <dt>Дата</dt>
+                <dd class="num">{{ operation.performed_at|date:"d.m.Y, H:i" }}</dd>
+                <dt>Материал</dt>
+                <dd>
                     <a href="{% url 'materials:detail' operation.material.id %}">
                         {{ operation.material.name }}
                     </a>
-                </p>
-                <p class="card-text">
-                    Количество: {{ operation.quantity }} {{ operation.material.unit }}
-                </p>
-                <p class="card-text">
-                    Склад:
-                    <a href="{% url 'warehouses:detail' operation.warehouse.id %}">
-                        {{ operation.warehouse.name }}
-                    </a>
-                    {% if operation.target_warehouse %}
-                        →
+                </dd>
+                {% if operation.target_warehouse %}
+                    <dt>Откуда</dt>
+                    <dd>
+                        <a href="{% url 'warehouses:detail' operation.warehouse.id %}">
+                            {{ operation.warehouse.name }}
+                        </a>
+                    </dd>
+                    <dt>Куда</dt>
+                    <dd>
                         <a href="{% url 'warehouses:detail' operation.target_warehouse.id %}">
                             {{ operation.target_warehouse.name }}
                         </a>
-                    {% endif %}
+                    </dd>
+                {% else %}
+                    <dt>Склад</dt>
+                    <dd>
+                        <a href="{% url 'warehouses:detail' operation.warehouse.id %}">
+                            {{ operation.warehouse.name }}
+                        </a>
+                    </dd>
+                {% endif %}
+            </dl>
+            {% if operation.is_cancelled %}
+                <p class="mt-3 mb-0 text-muted">
+                    Операция отменена, остатки вернулись к тому, что было до неё.
                 </p>
-            </div>
-        </div>
+            {% endif %}
+        </section>
     {% else %}
-        <h1 class="text-danger">Операция не найдена</h1>
-        <p>Операции с таким номером нет.</p>
+        <h1>Операция не найдена</h1>
+        <p class="lead-line">
+            Операции с номером {{ operation_id }} нет. Найдите нужную в
+            <a href="{% url 'operations:list' %}">истории операций</a>.
+        </p>
     {% endif %}
-
-    <a href="{% url 'operations:list' %}" class="btn btn-outline-secondary mt-3">
-        ← к истории операций
-    </a>
 {% endblock %}

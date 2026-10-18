@@ -9,58 +9,78 @@
 {% endblock %}
 
 {% block content %}
+    <nav class="crumbs" aria-label="Путь">
+        <a href="{% url 'materials:list' %}">Материалы</a>
+        / {% if material %}{{ material.name }}{% else %}№{{ material_id }}{% endif %}
+    </nav>
+
     {% if material %}
-        <div class="card mb-4">
-            <div class="card-body">
-                <h1 class="card-title h3">{{ material.name }}</h1>
-                <p class="card-text">Номер: {{ material.id }}</p>
-                <p class="card-text">Единица измерения: {{ material.unit }}</p>
-                <p class="card-text">
-                    Минимальный остаток: {{ material.min_balance }} {{ material.unit }}
-                </p>
-                <p class="card-text">
-                    Всего на складах: <strong>{{ total }} {{ material.unit }}</strong>
-                    {% include "includes/stock_badge.html" %}
-                </p>
-                <p class="card-text text-muted">{{ status }}</p>
+        <h1>{{ material.name }}</h1>
+
+        <section class="panel mt-3">
+            <div class="stock-head">
+                <strong class="num">{{ row.total }}</strong>
+                <span>{{ material.unit }} на всех складах</span>
+                {% include "includes/stock_badge.html" with level=row.level %}
             </div>
+            {% include "includes/stock_gauge.html" with large=True %}
+            <dl class="facts">
+                <dt>Минимальный остаток</dt>
+                <dd class="num">{{ material.min_balance }} {{ material.unit }}</dd>
+                <dt>Состояние</dt>
+                <dd>{{ status }}</dd>
+                <dt>Номер в учёте</dt>
+                <dd class="num">{{ material.id }}</dd>
+            </dl>
+        </section>
+
+        <h2>По складам</h2>
+        <div class="table-wrap">
+            <table class="sheet">
+                <tbody>
+                    {% for item in stock_items %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'warehouses:detail' item.warehouse.id %}">
+                                    {{ item.warehouse.name }}
+                                </a>
+                            </td>
+                            <td class="right qty">{{ item.quantity }} {{ material.unit }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td>Ни на одном складе этого материала нет.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
 
-        <h2 class="h5">По складам</h2>
-        <ul class="list-group mb-4">
-            {% for item in stock_items %}
-                <li class="list-group-item d-flex justify-content-between">
-                    <a href="{% url 'warehouses:detail' item.warehouse.id %}">
-                        {{ item.warehouse.name }}
-                    </a>
-                    <span>{{ item.quantity }} {{ material.unit }}</span>
-                </li>
-            {% empty %}
-                <li class="list-group-item">Ни на одном складе нет.</li>
-            {% endfor %}
-        </ul>
-
-        <h2 class="h5">Операции ({{ operations|length }})</h2>
-        <ul class="list-group mb-4">
-            {% for operation in operations %}
-                <li class="list-group-item d-flex justify-content-between">
-                    <a href="{% url 'operations:detail' operation.id %}">
-                        {{ operation.performed_at|date:"d.m.Y H:i" }},
-                        {{ operation.title|lower }} {{ operation.quantity }}
-                        {{ material.unit }}
-                    </a>
-                    {% include "operations/includes/operation_status.html" %}
-                </li>
-            {% empty %}
-                <li class="list-group-item">Операций нет.</li>
-            {% endfor %}
-        </ul>
+        <h2>Операции ({{ operations|length }})</h2>
+        <div class="table-wrap">
+            <table class="sheet">
+                <tbody>
+                    {% for operation in operations %}
+                        <tr class="op-{{ operation.operation_type }}{% if operation.is_cancelled %} operation-cancelled{% endif %}">
+                            <td class="num">{{ operation.performed_at|date:"d.m.Y H:i" }}</td>
+                            <td>
+                                <a href="{% url 'operations:detail' operation.id %}">
+                                    {{ operation.title }} №{{ operation.id }}
+                                </a>
+                            </td>
+                            <td>{{ operation.place }}</td>
+                            <td class="right">{% include "operations/includes/operation_qty.html" %}</td>
+                            <td class="right">{% include "operations/includes/operation_status.html" %}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td>С этим материалом ещё не было операций.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% else %}
-        <h1 class="text-danger">Материал не найден</h1>
-        <p>Материала с таким номером нет.</p>
+        <h1>Материал не найден</h1>
+        <p class="lead-line">
+            Материала с номером {{ material_id }} в учёте нет. Выберите
+            материал из <a href="{% url 'materials:list' %}">списка</a>.
+        </p>
     {% endif %}
-
-    <a href="{% url 'materials:list' %}" class="btn btn-outline-secondary">
-        ← к списку материалов
-    </a>
 {% endblock %}

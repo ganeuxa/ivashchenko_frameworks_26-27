@@ -21,6 +21,6 @@ def operation_detail(request: HttpRequest, operation_id: int) -> HttpResponse:
     return render(
         request,
         "operations/operation_detail.html",
-        {"operation": operation},
+        {"operation": operation, "operation_id": operation_id},
         status=404 if operation is None else 200,
     )

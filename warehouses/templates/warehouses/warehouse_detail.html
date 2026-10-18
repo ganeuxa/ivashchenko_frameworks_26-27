@@ -9,36 +9,48 @@
 {% endblock %}
 
 {% block content %}
+    <nav class="crumbs" aria-label="Путь">
+        <a href="{% url 'warehouses:list' %}">Склады</a>
+        / {% if warehouse %}{{ warehouse.name }}{% else %}№{{ warehouse_id }}{% endif %}
+    </nav>
+
     {% if warehouse %}
         <h1>{{ warehouse.name }}</h1>
-        <p class="text-muted">{{ warehouse.location }}</p>
+        <p class="lead-line">{{ warehouse.location|default:"Адрес не указан" }}</p>
 
-        <table class="table bg-white">
-            <thead>
-                <tr><th>Материал</th><th>На складе</th><th>Общий статус</th></tr>
-            </thead>
-            <tbody>
-                {% for row in rows %}
+        <div class="table-wrap mt-4">
+            <table class="sheet">
+                <thead>
                     <tr>
-                        <td>
-                            <a href="{% url 'materials:detail' row.item.material.id %}">
-                                {{ row.item.material.name }}
-                            </a>
-                        </td>
-                        <td>{{ row.item.quantity }} {{ row.item.material.unit }}</td>
-                        <td>{% include "includes/stock_badge.html" with level=row.level %}</td>
+                        <th>Материал</th>
+                        <th class="right">На этом складе</th>
+                        <th class="right">Всего</th>
+                        <th class="right">Статус</th>
                     </tr>
-                {% empty %}
-                    <tr><td colspan="3">Склад пустой.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'materials:detail' row.item.material.id %}">
+                                    {{ row.item.material.name }}
+                                </a>
+                            </td>
+                            <td class="right qty">{{ row.item.quantity }} {{ row.item.material.unit }}</td>
+                            <td class="right num">{{ row.total }}</td>
+                            <td class="right">{% include "includes/stock_badge.html" with level=row.level %}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4">На этом складе сейчас ничего нет.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% else %}
-        <h1 class="text-danger">Склад не найден</h1>
-        <p>Склада с таким номером нет.</p>
+        <h1>Склад не найден</h1>
+        <p class="lead-line">
+            Склада с номером {{ warehouse_id }} нет. Выберите склад из
+            <a href="{% url 'warehouses:list' %}">списка</a>.
+        </p>
     {% endif %}
-
-    <a href="{% url 'warehouses:list' %}" class="btn btn-outline-secondary">
-        ← к списку складов
-    </a>
 {% endblock %}

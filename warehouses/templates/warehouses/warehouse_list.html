@@ -4,13 +4,15 @@
 
 {% block content %}
     <h1>Склады</h1>
-    <p class="text-muted">Всего складов: {{ rows|length }}</p>
+    <p class="lead-line">Всего складов: {{ rows|length }}.</p>
 
-    <div class="list-group">
+    <ul class="ledger mt-4">
         {% for row in rows %}
             {% include "warehouses/includes/warehouse_item.html" %}
         {% empty %}
-            <p>Складов пока нет.</p>
+            <li class="ledger-empty">
+                Складов пока нет. Добавить их можно в консольной версии.
+            </li>
         {% endfor %}
-    </div>
+    </ul>
 {% endblock %}

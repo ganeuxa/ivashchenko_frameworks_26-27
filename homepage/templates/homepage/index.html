@@ -3,56 +3,26 @@
 {% block title %}Главная – Учёт материалов{% endblock %}
 
 {% block content %}
-    <h1 class="display-5">Учёт расходных материалов</h1>
-    <p class="lead">
-        Что лежит на складах, сколько осталось и что пора дозаказать.
+    <h1>Что пора дозаказать</h1>
+    <p class="lead-line">
+        Материалов в учёте: {{ materials_count }}, складов: {{ warehouses_count }},
+        операций: {{ operations_count }}. Здесь те материалы, которых на всех
+        складах вместе осталось меньше минимума.
     </p>
 
-    <div class="row g-3 my-3">
-        <div class="col-6 col-md-3">
-            <div class="card text-center stat-card"><div class="card-body">
-                <div class="stat-number">{{ materials_count }}</div>
-                <div class="text-muted">материалов</div>
-            </div></div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="card text-center stat-card"><div class="card-body">
-                <div class="stat-number">{{ warehouses_count }}</div>
-                <div class="text-muted">складов</div>
-            </div></div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="card text-center stat-card"><div class="card-body">
-                <div class="stat-number">{{ operations_count }}</div>
-                <div class="text-muted">операций</div>
-            </div></div>
-        </div>
-        <div class="col-6 col-md-3">
-            <div class="card text-center stat-card"><div class="card-body">
-                <div class="stat-number">{{ low_stock|length }}</div>
-                <div class="text-muted">пора дозаказать</div>
-            </div></div>
-        </div>
-    </div>
-
-    <h2 class="h4 mt-4">Что пора дозаказать</h2>
-    <ul class="list-group mb-4">
-        {% for material, total in low_stock %}
-            <li class="list-group-item d-flex justify-content-between">
-                <a href="{% url 'materials:detail' material.id %}">
-                    {{ material.name }}
-                </a>
-                <span>
-                    есть {{ total }}, минимум {{ material.min_balance }}
-                    {{ material.unit }}
-                </span>
-            </li>
+    <ul class="ledger mt-4">
+        {% for row in shortages %}
+            {% include "materials/includes/material_row.html" %}
         {% empty %}
-            <li class="list-group-item">Всё в норме, дозаказывать ничего не нужно.</li>
+            <li class="ledger-empty">
+                Всё в норме: ни один материал не опустился ниже минимума.
+            </li>
         {% endfor %}
     </ul>
 
-    <a href="{% url 'materials:list' %}" class="btn btn-primary me-2">Материалы</a>
-    <a href="{% url 'warehouses:list' %}" class="btn btn-secondary me-2">Склады</a>
-    <a href="{% url 'operations:list' %}" class="btn btn-outline-secondary">Операции</a>
+    <div class="quick-links">
+        <a href="{% url 'materials:list' %}">Все материалы</a>
+        <a href="{% url 'warehouses:list' %}">Склады</a>
+        <a href="{% url 'operations:list' %}">История операций</a>
+    </div>
 {% endblock %}

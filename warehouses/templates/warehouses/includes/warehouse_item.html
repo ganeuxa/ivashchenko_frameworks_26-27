@@ -1,14 +1,12 @@
-<a
-    href="{% url 'warehouses:detail' row.warehouse.id %}"
-    class="list-group-item list-group-item-action d-flex justify-content-between"
->
-    <div>
-        <div class="fw-semibold">{{ row.warehouse.name }}</div>
-        <div class="text-muted small">
+<li class="ledger-row ledger-row-simple">
+    <a class="ledger-name" href="{% url 'warehouses:detail' row.warehouse.id %}">
+        {{ row.warehouse.name }}
+        <span class="ledger-sub">
             {{ row.warehouse.location|default:"адрес не указан" }}
-        </div>
+        </span>
+    </a>
+    <div class="ledger-amount">
+        <strong class="num">{{ row.positions }}</strong>
+        <span class="ledger-sub">видов материалов</span>
     </div>
-    <span class="badge bg-primary align-self-center">
-        позиций: {{ row.positions }}
-    </span>
-</a>
+</li>

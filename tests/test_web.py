@@ -76,6 +76,18 @@ def test_cancelled_operation_marked(client):
     assert "отменена" in html
 
 
+def test_gauge_shows_fill_and_minimum(client):
+    html = client.get("/materials/").content.decode()
+    assert "width: 100%" in html
+    assert "left: 25%" in html
+
+
+def test_navigation_marks_current_section(client):
+    html = client.get("/materials/").content.decode()
+    assert 'href="/materials/"' in html
+    assert 'aria-current="page"' in html
+
+
 def test_navigation_uses_named_urls(client):
     html = client.get("/").content.decode()
     assert 'href="/materials/"' in html
@@ -100,4 +112,4 @@ def test_material_id_must_be_number(client):
 def test_custom_404_page(client):
     response = client.get("/nonexistent/")
     assert response.status_code == 404
-    assert "страница не найдена" in response.content.decode()
+    assert "Страница не найдена" in response.content.decode()
