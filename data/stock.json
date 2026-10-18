@@ -1,0 +1,8 @@
+[
+    {"material_id": 1, "warehouse_id": 1, "quantity": 40},
+    {"material_id": 1, "warehouse_id": 2, "quantity": 15},
+    {"material_id": 2, "warehouse_id": 1, "quantity": 2},
+    {"material_id": 3, "warehouse_id": 1, "quantity": 120},
+    {"material_id": 4, "warehouse_id": 2, "quantity": 8},
+    {"material_id": 5, "warehouse_id": 1, "quantity": 12}
+]

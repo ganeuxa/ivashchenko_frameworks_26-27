@@ -1,0 +1,7 @@
+[
+    {"id": 1, "name": "Бумага офисная А4", "unit": "пачка", "min_balance": 10},
+    {"id": 2, "name": "Картридж HP 85A", "unit": "шт", "min_balance": 3},
+    {"id": 3, "name": "Ручка шариковая синяя", "unit": "шт", "min_balance": 50},
+    {"id": 4, "name": "Средство для мытья полов", "unit": "л", "min_balance": 5},
+    {"id": 5, "name": "Батарейки AA", "unit": "шт", "min_balance": 20}
+]
