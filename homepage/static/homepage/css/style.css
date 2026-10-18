@@ -1,0 +1,57 @@
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f4f6f8;
+}
+
+main {
+    flex: 1;
+}
+
+.site-nav {
+    background-color: #2f4858;
+}
+
+.site-logo {
+    width: 32px;
+    height: 32px;
+    margin-right: 0.5rem;
+}
+
+.site-footer {
+    padding: 1rem 0;
+    color: #6c757d;
+    border-top: 1px solid #dee2e6;
+    background-color: #fff;
+}
+
+.stat-card .stat-number {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2f4858;
+}
+
+.material-card {
+    height: 100%;
+    border-left: 4px solid #2f4858;
+}
+
+.material-card.level-low {
+    border-left-color: #f0ad4e;
+}
+
+.material-card.level-empty {
+    border-left-color: #d9534f;
+}
+
+.stock-badge,
+.operation-status {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.operation-cancelled td {
+    color: #adb5bd;
+    text-decoration: line-through;
+}
