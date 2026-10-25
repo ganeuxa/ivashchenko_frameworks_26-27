@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from functools import wraps
+from typing import Any
 
 from models import Material, Warehouse
 from models.materials import (
@@ -29,7 +30,7 @@ from utils import input_int, input_text
 def saves_data(action: Callable[..., None]) -> Callable[..., None]:
     """Декоратор: после успешного действия сохраняет данные."""
     @wraps(action)
-    def wrapper(data: dict, *args, **kwargs) -> None:
+    def wrapper(data: dict, *args: Any, **kwargs: Any) -> None:
         action(data, *args, **kwargs)
         save_data(data)
     return wrapper

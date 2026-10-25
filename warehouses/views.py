@@ -31,7 +31,10 @@ def warehouse_detail(request: HttpRequest, warehouse_id: int) -> HttpResponse:
     """Что лежит на выбранном складе."""
     data = load_data()
     warehouse = find_warehouse_by_id(data["warehouses"], warehouse_id)
-    context = {"warehouse": warehouse, "warehouse_id": warehouse_id}
+    context: dict[str, object] = {
+        "warehouse": warehouse,
+        "warehouse_id": warehouse_id,
+    }
     if warehouse is not None:
         rows = []
         for item in get_warehouse_stock(data["stock"], warehouse):

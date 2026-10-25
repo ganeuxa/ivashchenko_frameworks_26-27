@@ -107,9 +107,10 @@ def load_operations(
         warehouse = get_warehouse_by_id(warehouses, record["warehouse_id"])
         is_cancelled = record.get("is_cancelled", False)
         if operation_class is Transfer:
-            target = get_warehouse_by_id(
-                warehouses, record.get("target_warehouse_id")
-            )
+            target_id = record.get("target_warehouse_id")
+            if target_id is None:
+                raise ValueError("у перемещения не указан склад назначения")
+            target = get_warehouse_by_id(warehouses, target_id)
             return Transfer(
                 record["id"], material, warehouse, target,
                 record["quantity"], record["date"], is_cancelled,

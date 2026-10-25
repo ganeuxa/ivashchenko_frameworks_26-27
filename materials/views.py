@@ -23,7 +23,10 @@ def material_detail(request: HttpRequest, material_id: int) -> HttpResponse:
     """Карточка материала: остатки по складам и операции."""
     data = load_data()
     material = find_material_by_id(data["materials"], material_id)
-    context = {"material": material, "material_id": material_id}
+    context: dict[str, object] = {
+        "material": material,
+        "material_id": material_id,
+    }
     if material is not None:
         row = summarize_material(data["stock"], material)
         context["row"] = row
