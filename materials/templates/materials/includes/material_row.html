@@ -1,13 +1,13 @@
 <li class="ledger-row level-{{ row.level }}">
-    <a class="ledger-name" href="{% url 'materials:detail' row.material.id %}">
-        {{ row.material.name|default:"Без названия" }}
+    <a class="ledger-name" href="{% url 'materials:detail' row.id %}">
+        {{ row.name|default:"Без названия" }}
         <span class="ledger-sub">
-            минимум {{ row.material.min_balance }} {{ row.material.unit }}
+            минимум {{ row.min_balance }} {{ row.unit }}
         </span>
     </a>
     {% include "includes/stock_gauge.html" %}
     <div class="ledger-amount">
-        <strong class="num">{{ row.total }}</strong> {{ row.material.unit }}
+        <strong class="num">{{ row.total }}</strong> {{ row.unit }}
         <div>{% include "includes/stock_badge.html" with level=row.level %}</div>
     </div>
 </li>

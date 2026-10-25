@@ -41,8 +41,8 @@
                     {% for item in stock_items %}
                         <tr>
                             <td>
-                                <a href="{% url 'warehouses:detail' item.warehouse.id %}">
-                                    {{ item.warehouse.name }}
+                                <a href="{% url 'warehouses:detail' item.warehouse_id %}">
+                                    {{ item.warehouse_name }}
                                 </a>
                             </td>
                             <td class="right qty">{{ item.quantity }} {{ material.unit }}</td>
@@ -66,7 +66,7 @@
                                     {{ operation.title }} №{{ operation.id }}
                                 </a>
                             </td>
-                            <td>{{ operation.place }}</td>
+                            <td>{% include "operations/includes/operation_place.html" %}</td>
                             <td class="right">{% include "operations/includes/operation_qty.html" %}</td>
                             <td class="right">{% include "operations/includes/operation_status.html" %}</td>
                         </tr>

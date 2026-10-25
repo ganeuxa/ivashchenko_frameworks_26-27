@@ -27,28 +27,28 @@
                 <dd class="num">{{ operation.performed_at|date:"d.m.Y, H:i" }}</dd>
                 <dt>Материал</dt>
                 <dd>
-                    <a href="{% url 'materials:detail' operation.material.id %}">
-                        {{ operation.material.name }}
+                    <a href="{% url 'materials:detail' operation.material_id %}">
+                        {{ operation.material_name }}
                     </a>
                 </dd>
-                {% if operation.target_warehouse %}
+                {% if operation.target_warehouse_id %}
                     <dt>Откуда</dt>
                     <dd>
-                        <a href="{% url 'warehouses:detail' operation.warehouse.id %}">
-                            {{ operation.warehouse.name }}
+                        <a href="{% url 'warehouses:detail' operation.warehouse_id %}">
+                            {{ operation.warehouse_name }}
                         </a>
                     </dd>
                     <dt>Куда</dt>
                     <dd>
-                        <a href="{% url 'warehouses:detail' operation.target_warehouse.id %}">
-                            {{ operation.target_warehouse.name }}
+                        <a href="{% url 'warehouses:detail' operation.target_warehouse_id %}">
+                            {{ operation.target_name }}
                         </a>
                     </dd>
                 {% else %}
                     <dt>Склад</dt>
                     <dd>
-                        <a href="{% url 'warehouses:detail' operation.warehouse.id %}">
-                            {{ operation.warehouse.name }}
+                        <a href="{% url 'warehouses:detail' operation.warehouse_id %}">
+                            {{ operation.warehouse_name }}
                         </a>
                     </dd>
                 {% endif %}

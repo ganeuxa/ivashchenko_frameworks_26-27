@@ -36,3 +36,12 @@ def next_id(ids: Iterable[int]) -> int:
 def now_str() -> str:
     """Текущие дата и время строкой."""
     return datetime.now().strftime(DATE_FORMAT)
+
+
+def parse_int(raw_value: str | None, min_value: int = 1) -> int | None:
+    """Число из параметра запроса или None, если там не число."""
+    try:
+        number = int(raw_value or "")
+    except ValueError:
+        return None
+    return number if number >= min_value else None

@@ -1,23 +1,14 @@
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from models.stock import low_stock_materials, summarize_material
-from storage import load_data
+from db.queries import fetch_all, fetch_one, with_gauge
 
 
 def index(request: HttpRequest) -> HttpResponse:
-    """Главная: что пора дозаказать и короткая сводка."""
-    data = load_data()
+    """Главная: что пора дозаказать и короткая сводка из базы."""
     context = {
-        "materials_count": len(data["materials"]),
-        "warehouses_count": len(data["warehouses"]),
-        "operations_count": len(data["operations"]),
-        "shortages": [
-            summarize_material(data["stock"], material)
-            for material, _ in low_stock_materials(
-                data["materials"], data["stock"]
-            )
-        ],
+        "summary": fetch_one("summary_counts"),
+        "shortages": with_gauge(fetch_all("low_stock")),
     }
     return render(request, "homepage/index.html", context)
 

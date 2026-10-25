@@ -1,1 +1,1 @@
-<span class="qty">{% if operation.operation_type == "receipt" %}+{% elif operation.operation_type == "write_off" %}−{% else %}⇄ {% endif %}{{ operation.quantity }} {{ operation.material.unit }}</span>
+<span class="qty">{% if operation.operation_type == "receipt" %}+{% elif operation.operation_type == "write_off" %}−{% else %}⇄ {% endif %}{{ operation.quantity }} {{ operation.unit }}</span>

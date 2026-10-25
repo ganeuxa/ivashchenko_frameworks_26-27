@@ -5,9 +5,10 @@
 {% block content %}
     <h1>Что пора дозаказать</h1>
     <p class="lead-line">
-        Материалов в учёте: {{ materials_count }}, складов: {{ warehouses_count }},
-        операций: {{ operations_count }}. Здесь те материалы, которых на всех
-        складах вместе осталось меньше минимума.
+        Материалов в учёте: {{ summary.materials_count }},
+        складов: {{ summary.warehouses_count }},
+        проведённых операций: {{ summary.operations_count }}. Здесь те
+        материалы, которых на всех складах вместе осталось меньше минимума.
     </p>
 
     <ul class="ledger mt-4">
@@ -22,7 +23,8 @@
 
     <div class="quick-links">
         <a href="{% url 'materials:list' %}">Все материалы</a>
-        <a href="{% url 'warehouses:list' %}">Склады</a>
+        <a href="{% url 'materials:find' %}">Где взять материал</a>
         <a href="{% url 'operations:list' %}">История операций</a>
+        <a href="{% url 'operations:statistics' %}">Статистика</a>
     </div>
 {% endblock %}

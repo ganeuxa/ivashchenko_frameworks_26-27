@@ -1,8 +1,8 @@
 <li class="ledger-row ledger-row-simple">
-    <a class="ledger-name" href="{% url 'warehouses:detail' row.warehouse.id %}">
-        {{ row.warehouse.name }}
+    <a class="ledger-name" href="{% url 'warehouses:detail' row.id %}">
+        {{ row.name }}
         <span class="ledger-sub">
-            {{ row.warehouse.location|default:"адрес не указан" }}
+            {{ row.location|default:"адрес не указан" }}
         </span>
     </a>
     <div class="ledger-amount">

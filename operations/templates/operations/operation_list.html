@@ -9,8 +9,21 @@
         остаётся в истории, но на остатки уже не влияет.
     </p>
 
-    <div class="sheet-tools mt-4">
-        <span>Всего операций: {{ operations|length }}</span>
+    <nav class="type-filter mt-4" aria-label="Тип операции">
+        <a
+            href="{% url 'operations:list' %}"
+            {% if not current_type %}aria-current="page"{% endif %}
+        >Все</a>
+        {% for type_code, title in titles.items %}
+            <a
+                href="{% url 'operations:list' %}?type={{ type_code }}"
+                {% if type_code == current_type %}aria-current="page"{% endif %}
+            >{{ title }}</a>
+        {% endfor %}
+    </nav>
+
+    <div class="sheet-tools">
+        <span>Показано операций: {{ operations|length }}</span>
         <label>
             <input type="checkbox" class="form-check-input" id="hide-cancelled">
             Скрыть отменённые
@@ -38,8 +51,8 @@
                         </td>
                         <td class="num">{{ operation.performed_at|date:"d.m.Y H:i" }}</td>
                         <td>{{ operation.title }}</td>
-                        <td class="op-material">{{ operation.material.name }}</td>
-                        <td>{{ operation.place }}</td>
+                        <td class="op-material">{{ operation.material_name }}</td>
+                        <td>{% include "operations/includes/operation_place.html" %}</td>
                         <td class="right">{% include "operations/includes/operation_qty.html" %}</td>
                         <td class="right">{% include "operations/includes/operation_status.html" %}</td>
                     </tr>

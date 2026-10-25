@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Где взять материал – Учёт материалов{% endblock %}
+
+{% block content %}
+    <nav class="crumbs" aria-label="Путь">
+        <a href="{% url 'materials:list' %}">Материалы</a> / Где взять материал
+    </nav>
+    <h1>Где взять материал</h1>
+    <p class="lead-line">
+        Выберите материал и сколько нужно. Покажем склады, где его хватит.
+    </p>
+
+    <form method="get" class="panel search-form mt-3">
+        <label>
+            Материал
+            <select name="material" class="form-select" required>
+                <option value="">выберите</option>
+                {% for item in materials %}
+                    <option value="{{ item.id }}"{% if item.id == material_id %} selected{% endif %}>
+                        {{ item.name }} ({{ item.unit }})
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>
+            Сколько нужно
+            <input
+                type="number"
+                name="quantity"
+                min="1"
+                class="form-control"
+                value="{{ quantity|default:'' }}"
+                required
+            >
+        </label>
+        <button type="submit" class="btn btn-primary">Найти</button>
+    </form>
+
+    {% if material %}
+        <h2>{{ material.name }}: нужно {{ quantity }} {{ material.unit }}</h2>
+        <ul class="ledger">
+            {% for warehouse in warehouses %}
+                <li class="ledger-row ledger-row-simple">
+                    <a class="ledger-name" href="{% url 'warehouses:detail' warehouse.id %}">
+                        {{ warehouse.name }}
+                        <span class="ledger-sub">
+                            {{ warehouse.location|default:"адрес не указан" }}
+                        </span>
+                    </a>
+                    <div class="ledger-amount">
+                        <strong class="num">{{ warehouse.quantity }}</strong>
+                        {{ material.unit }}
+                    </div>
+                </li>
+            {% empty %}
+                <li class="ledger-empty">
+                    Ни на одном складе столько нет. Попробуйте меньшее
+                    количество или посмотрите
+                    <a href="{% url 'materials:detail' material.id %}">остатки по складам</a>.
+                </li>
+            {% endfor %}
+        </ul>
+    {% elif searched %}
+        <p class="lead-line mt-4">
+            Выберите материал из списка и укажите количество целым числом
+            больше нуля.
+        </p>
+    {% endif %}
+{% endblock %}

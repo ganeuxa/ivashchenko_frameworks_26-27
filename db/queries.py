@@ -53,14 +53,15 @@ def with_gauge(rows: list[sqlite3.Row]) -> list[dict]:
     ]
 
 
-def with_dates(rows: list[sqlite3.Row]) -> list[dict]:
-    """Превращает строку performed_at в datetime для фильтра date."""
-    return [
-        {
-            **dict(row),
-            "performed_at": datetime.strptime(
-                row["performed_at"], DATE_FORMAT
-            ),
-        }
-        for row in rows
-    ]
+def with_dates(
+    rows: list[sqlite3.Row],
+    fields: Sequence[str] = ("performed_at",),
+) -> list[dict]:
+    """Превращает строки с датами в datetime для фильтра date."""
+    result = []
+    for row in rows:
+        item = dict(row)
+        for field in fields:
+            item[field] = datetime.strptime(row[field], DATE_FORMAT)
+        result.append(item)
+    return result

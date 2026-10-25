@@ -32,11 +32,11 @@
                     {% for row in rows %}
                         <tr>
                             <td>
-                                <a href="{% url 'materials:detail' row.item.material.id %}">
-                                    {{ row.item.material.name }}
+                                <a href="{% url 'materials:detail' row.material_id %}">
+                                    {{ row.material_name }}
                                 </a>
                             </td>
-                            <td class="right qty">{{ row.item.quantity }} {{ row.item.material.unit }}</td>
+                            <td class="right qty">{{ row.quantity }} {{ row.unit }}</td>
                             <td class="right num">{{ row.total }}</td>
                             <td class="right">{% include "includes/stock_badge.html" with level=row.level %}</td>
                         </tr>

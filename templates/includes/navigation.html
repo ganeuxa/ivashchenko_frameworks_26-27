@@ -1,5 +1,5 @@
 {% load static %}
-{% with section=request.resolver_match.app_name %}
+{% with section=request.resolver_match.app_name page=request.resolver_match.url_name %}
 <header class="site-header">
     <div class="site-header-inner">
         <a class="site-brand" href="{% url 'homepage:index' %}">
@@ -17,8 +17,12 @@
             >Склады</a>
             <a
                 href="{% url 'operations:list' %}"
-                {% if section == "operations" %}aria-current="page"{% endif %}
+                {% if section == "operations" and page != "statistics" %}aria-current="page"{% endif %}
             >Операции</a>
+            <a
+                href="{% url 'operations:statistics' %}"
+                {% if page == "statistics" %}aria-current="page"{% endif %}
+            >Статистика</a>
         </nav>
     </div>
 </header>

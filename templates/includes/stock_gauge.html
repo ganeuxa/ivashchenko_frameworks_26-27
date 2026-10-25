@@ -1,7 +1,7 @@
 <div
     class="gauge level-{{ row.level }}{% if large %} gauge-large{% endif %}"
     role="img"
-    aria-label="Остаток {{ row.total }} {{ row.material.unit }}, минимум {{ row.material.min_balance }}"
+    aria-label="Остаток {{ row.total }} {{ row.unit }}, минимум {{ row.min_balance }}"
 >
     <div class="gauge-fill" style="width: {{ row.fill }}%"></div>
     <div class="gauge-mark" style="left: {{ row.mark }}%" title="Минимум"></div>
