@@ -123,16 +123,23 @@ def get_stock_status(current_balance: int, minimum: int) -> str:
     return "Остаток в норме"
 
 
+def stock_gauge(total: int, minimum: int) -> dict:
+    """Уровень остатка и ширина шкалы: за 100% берётся удвоенный минимум."""
+    scale = max(minimum * 2, total, 1)
+    return {
+        "level": get_stock_level(total, minimum),
+        "fill": round(total * 100 / scale),
+        "mark": round(minimum * 100 / scale),
+    }
+
+
 def summarize_material(stock: list[StockItem], material: Material) -> dict:
     """Остаток, уровень и шкала материала для страниц."""
     total = get_total_balance(stock, material)
-    scale = max(material.min_balance * 2, total, 1)
     return {
         "material": material,
         "total": total,
-        "level": get_stock_level(total, material.min_balance),
-        "fill": round(total * 100 / scale),
-        "mark": round(material.min_balance * 100 / scale),
+        **stock_gauge(total, material.min_balance),
     }
 
 
