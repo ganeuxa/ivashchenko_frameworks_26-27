@@ -29,6 +29,8 @@
                 <dd class="num">{{ material.min_balance }} {{ material.unit }}</dd>
                 <dt>Состояние</dt>
                 <dd>{{ status }}</dd>
+                <dt>Целевой запас</dt>
+                <dd>{{ material.reorder_target }} {{ material.unit }}</dd>
                 <dt>Номер в учёте</dt>
                 <dd class="num">{{ material.id }}</dd>
             </dl>
@@ -59,7 +61,7 @@
             <table class="sheet">
                 <tbody>
                     {% for operation in operations %}
-                        <tr class="op-{{ operation.operation_type }}{% if operation.is_cancelled %} operation-cancelled{% endif %}">
+                        <tr class="op-{{ operation.operation_type }}{% if operation.status == operation.Status.CANCELLED %} operation-cancelled{% endif %}">
                             <td class="num">{{ operation.performed_at|date:"d.m.Y H:i" }}</td>
                             <td>
                                 <a href="{% url 'operations:detail' operation.id %}">

@@ -1,5 +1,7 @@
-{% if operation.is_cancelled %}
-    <span class="tag tag-cancelled">отменена</span>
+{% if operation.status == operation.Status.CANCELLED %}
+    <span class="badge text-bg-secondary">отменена</span>
+{% elif operation.status == operation.Status.DRAFT %}
+    <span class="badge text-bg-warning">черновик</span>
 {% else %}
-    <span class="tag tag-ok">проведена</span>
+    <span class="badge text-bg-success">проведена</span>
 {% endif %}

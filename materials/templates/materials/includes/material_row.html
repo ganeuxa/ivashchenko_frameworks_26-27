@@ -1,5 +1,5 @@
 <li class="ledger-row level-{{ row.level }}">
-    <a class="ledger-name" href="{% url 'materials:detail' row.id %}">
+    <a class="ledger-name" href="{% url 'materials:by_slug' row.slug %}">
         {{ row.name|default:"Без названия" }}
         <span class="ledger-sub">
             минимум {{ row.min_balance }} {{ row.unit }}

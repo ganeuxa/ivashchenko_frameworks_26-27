@@ -1,5 +1,5 @@
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 
 from db import orm
 from materials.models import Material
@@ -35,8 +35,8 @@ def material_detail(request: HttpRequest, material_id: int) -> HttpResponse:
         }
         context["status"] = get_stock_status(total, material.min_balance)
         context["stock_items"] = stock_items
-        context["operations"] = orm.related_operations().filter(
-            material_id=material_id,
+        context["operations"] = orm.related_operations().for_material(
+            material_id,
         ).order_by("performed_at", "id")
     return render(
         request,
@@ -66,3 +66,8 @@ def find_warehouse(request: HttpRequest) -> HttpResponse:
         "warehouses": warehouses,
     }
     return render(request, "materials/find_warehouse.html", context)
+
+
+def material_by_slug(request, slug):
+    material = get_object_or_404(Material, slug=slug)
+    return material_detail(request, material.pk)

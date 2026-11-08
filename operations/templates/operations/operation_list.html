@@ -5,8 +5,8 @@
 {% block content %}
     <h1>Операции</h1>
     <p class="lead-line">
-        Приходы, расходы и перемещения, новые сверху. Отменённая операция
-        остаётся в истории, но на остатки уже не влияет.
+        Приходы, расходы и перемещения. На остатки влияют только проведённые
+        операции. Черновики и отменённые записи остаются в истории.
     </p>
 
     <form method="get" class="panel search-form mt-3">
@@ -14,6 +14,10 @@
         <label>Тип <select name="type" class="form-select">
             <option value="">Все</option>
             {% for code, title in titles.items %}<option value="{{ code }}" {% if current_type == code %}selected{% endif %}>{{ title }}</option>{% endfor %}
+        </select></label>
+        <label>Статус <select name="status" class="form-select">
+            <option value="">Все</option>
+            {% for code, label in statuses %}<option value="{{ code }}" {% if current_status == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
         </select></label>
         <label>Склад <select name="warehouse" class="form-select">
             <option value="">Все</option>
@@ -49,7 +53,7 @@
             </thead>
             <tbody>
                 {% for operation in operations %}
-                    <tr class="op-{{ operation.operation_type }}{% if operation.is_cancelled %} operation-cancelled{% endif %}">
+                    <tr class="op-{{ operation.operation_type }}{% if operation.status == operation.Status.CANCELLED %} operation-cancelled{% endif %}">
                         <td class="num">
                             <a href="{% url 'operations:detail' operation.id %}">{{ operation.id }}</a>
                         </td>

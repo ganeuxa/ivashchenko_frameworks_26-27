@@ -8,6 +8,11 @@
         Считаются только проведённые операции, отменённые не учитываются.
     </p>
 
+    <section class="panel mt-3">
+        <h2>Статусы операций</h2>
+        <p>Всего: {{ status_counts.total }}. Проведено: {{ status_counts.posted }}.
+           Отменено: {{ status_counts.cancelled }}. Черновиков: {{ status_counts.drafts }}.</p>
+    </section>
     <h2>Операции по типам</h2>
     <div class="table-wrap">
         <table class="sheet">

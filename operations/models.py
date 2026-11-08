@@ -2,33 +2,52 @@ from django.db import models
 from django.db.models import F, Q
 from django.utils import timezone
 
+from .querysets import OperationQuerySet
+
 
 class Operation(models.Model):
+    class Status(models.TextChoices):
+        POSTED = "posted", "Проведена"
+        CANCELLED = "cancelled", "Отменена"
+        DRAFT = "draft", "Черновик"
+
     class Type(models.TextChoices):
         RECEIPT = "receipt", "Приход"
         WRITE_OFF = "write_off", "Расход"
         TRANSFER = "transfer", "Перемещение"
 
-    type = models.CharField(max_length=12, choices=Type.choices)
+    type = models.CharField("Тип", max_length=12, choices=Type.choices)
     material = models.ForeignKey(
         "materials.Material", on_delete=models.PROTECT,
         related_name="operations",
+        verbose_name="Материал",
     )
     warehouse = models.ForeignKey(
         "warehouses.Warehouse", on_delete=models.PROTECT,
         related_name="operations",
+        verbose_name="Склад отправления",
     )
     target_warehouse = models.ForeignKey(
         "warehouses.Warehouse", on_delete=models.PROTECT,
         related_name="incoming_transfers", null=True, blank=True,
+        verbose_name="Склад назначения",
     )
-    quantity = models.PositiveIntegerField()
-    performed_at = models.DateTimeField(default=timezone.now)
-    is_cancelled = models.BooleanField(default=False)
+    quantity = models.PositiveIntegerField("Количество")
+    performed_at = models.DateTimeField("Дата", default=timezone.now)
+    status = models.CharField(
+        "Статус", max_length=12, choices=Status.choices, default=Status.DRAFT,
+    )
+    objects = OperationQuerySet.as_manager()
 
     class Meta:
         ordering = ["-performed_at", "-id"]
+        verbose_name = "операция"
+        verbose_name_plural = "операции"
         constraints = [
+            models.CheckConstraint(
+                condition=Q(status__in=["posted", "cancelled", "draft"]),
+                name="operation_valid_status",
+            ),
             models.CheckConstraint(
                 condition=Q(quantity__gt=0),
                 name="operation_positive_quantity",

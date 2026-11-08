@@ -9,6 +9,8 @@ class Warehouse(models.Model):
 
     class Meta:
         ordering = ["name"]
+        verbose_name = "склад"
+        verbose_name_plural = "склады"
 
     def __str__(self):
         return self.name
@@ -17,13 +19,17 @@ class Warehouse(models.Model):
 class Stock(models.Model):
     material = models.ForeignKey(
         "materials.Material", on_delete=models.PROTECT, related_name="stocks",
+        verbose_name="Материал",
     )
     warehouse = models.ForeignKey(
         Warehouse, on_delete=models.PROTECT, related_name="stocks",
+        verbose_name="Склад",
     )
-    quantity = models.PositiveIntegerField(default=0)
+    quantity = models.PositiveIntegerField("Количество", default=0)
 
     class Meta:
+        verbose_name = "остаток"
+        verbose_name_plural = "остатки"
         constraints = [models.UniqueConstraint(
             fields=["material", "warehouse"], name="unique_material_warehouse",
         )]

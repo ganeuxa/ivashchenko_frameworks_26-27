@@ -36,7 +36,12 @@ def operations(request):
         )
     hide_cancelled = request.GET.get("hide_cancelled") == "1"
     if hide_cancelled:
-        rows = rows.exclude(is_cancelled=True)
+        rows = rows.exclude(status=Operation.Status.CANCELLED)
+    status = request.GET.get("status", "")
+    if status in Operation.Status.values:
+        rows = rows.filter(status=status)
+    else:
+        status = ""
     warehouse_id = parse_int(request.GET.get("warehouse"))
     if warehouse_id:
         rows = rows.filter(Q(warehouse_id=warehouse_id)
@@ -60,6 +65,7 @@ def operations(request):
         "operations": page.object_list, "page_obj": page,
         "titles": OPERATION_TITLES, "current_type": operation_type,
         "query": query, "sort": sort, "hide_cancelled": hide_cancelled,
+        "statuses": Operation.Status.choices, "current_status": status,
         "warehouse_id": warehouse_id, "warehouses": orm.warehouse_positions(),
         "date_from": dates["from"], "date_to": dates["to"], "errors": errors,
     })

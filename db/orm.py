@@ -22,14 +22,12 @@ def gauge_rows(rows):
 
 def material_rows(queryset):
     return gauge_rows(queryset.values(
-        "id", "name", "unit", "min_balance", "total",
+        "id", "name", "unit", "min_balance", "total", "slug",
     ))
 
 
 def related_operations():
-    return Operation.objects.select_related(
-        "material", "warehouse", "target_warehouse",
-    )
+    return Operation.objects.with_related()
 
 
 def material_stock(material_id):
@@ -72,9 +70,9 @@ def summary():
     return {
         "materials_count": Material.objects.count(),
         "warehouses_count": Warehouse.objects.count(),
-        "operations_count": Operation.objects.exclude(
-            is_cancelled=True,
-        ).aggregate(total=Count("id"))["total"],
+        "operations_count": Operation.objects.posted().aggregate(
+            total=Count("id"),
+        )["total"],
     }
 
 
@@ -85,7 +83,7 @@ def shortages():
 
 
 def statistics_data(min_consumed):
-    active = Operation.objects.exclude(is_cancelled=True).order_by()
+    active = Operation.objects.posted().order_by()
     by_type = list(active.values(
         "type",
     ).annotate(
@@ -96,12 +94,21 @@ def statistics_data(min_consumed):
         row["operation_type"] = row["type"]
         row["title"] = Operation.Type(row["type"]).label
     by_warehouse = Warehouse.objects.annotate(operations_count=Count(
-        "operations", filter=Q(operations__is_cancelled=False),
+        "operations", filter=Q(operations__status=Operation.Status.POSTED),
     )).order_by("-operations_count", "name")
-    valid = Q(operations__type="write_off", operations__is_cancelled=False)
+    valid = Q(operations__type=Operation.Type.WRITE_OFF,
+              operations__status=Operation.Status.POSTED)
     consumption = Material.objects.annotate(
         write_offs=Count("operations", filter=valid),
         consumed=Sum("operations__quantity", filter=valid, default=0),
     ).filter(consumed__gte=min_consumed).order_by("-consumed", "name")
     return {"by_type": by_type, "by_warehouse": by_warehouse,
-            "consumption": consumption, "min_consumed": min_consumed}
+            "consumption": consumption, "min_consumed": min_consumed,
+            "status_counts": Operation.objects.aggregate(
+                total=Count("id"),
+                posted=Count("id", filter=Q(status=Operation.Status.POSTED)),
+                cancelled=Count(
+                    "id", filter=Q(status=Operation.Status.CANCELLED),
+                ),
+                drafts=Count("id", filter=Q(status=Operation.Status.DRAFT)),
+            )}

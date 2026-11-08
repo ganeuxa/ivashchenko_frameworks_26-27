@@ -24,7 +24,7 @@ def test_transfer_preserves_data_and_refuses_second_import(db_path):
     op = Operation.objects.get(pk=4)
     assert op.target_warehouse.name == "Склад №2"
     assert op.material.name == "Бумага А4"
-    assert Operation.objects.get(pk=2).is_cancelled
+    assert Operation.objects.get(pk=2).status == Operation.Status.CANCELLED
     with pytest.raises(ValueError, match="не пусты"):
         transfer_legacy(db_path)
     assert Operation.objects.count() == 4
@@ -73,6 +73,7 @@ def test_search_filters_sort_and_pagination():
     for _ in range(23):
         Operation.objects.create(
             type="receipt", material_id=1, warehouse_id=1, quantity=2,
+            status=Operation.Status.POSTED,
         )
     params = {"q": "Бумага", "type": "receipt", "sort": "oldest",
               "hide_cancelled": "1", "page": 2}

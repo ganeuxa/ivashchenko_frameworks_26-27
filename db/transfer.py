@@ -23,9 +23,8 @@ def transfer_legacy(source):
         conn.row_factory = sqlite3.Row
         data = {name: list(map(dict, conn.execute(f"SELECT * FROM {name}")))
                 for name in ("materials", "warehouses", "stock", "operations")}
-    Material.objects.bulk_create(
-        [Material(**row) for row in data["materials"]],
-    )
+    for row in data["materials"]:
+        Material.objects.create(**row)
     Warehouse.objects.bulk_create([
         Warehouse(**{**row, "location": row["location"] or ""})
         for row in data["warehouses"]
@@ -36,6 +35,9 @@ def transfer_legacy(source):
         row["performed_at"] = timezone.make_aware(
             datetime.strptime(row["performed_at"], "%Y-%m-%d %H:%M"),
         )
+        row["status"] = (Operation.Status.CANCELLED
+                         if row.pop("is_cancelled")
+                         else Operation.Status.POSTED)
         obj = Operation(**row)
         obj.full_clean()
         operations.append(obj)
