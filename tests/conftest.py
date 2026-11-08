@@ -3,7 +3,9 @@ from contextlib import closing
 
 import django
 import pytest
-from django.test.utils import setup_test_environment
+from django.test.utils import (
+    setup_databases, setup_test_environment, teardown_databases,
+)
 
 from db.database import get_connection
 from db.import_json import import_all
@@ -48,3 +50,27 @@ def db_path(tmp_path, monkeypatch):
         conn.commit()
     monkeypatch.setattr("db.database.DB_PATH", path)
     return path
+
+
+@pytest.fixture(scope="session")
+def django_database():
+    config = setup_databases(verbosity=0, interactive=False)
+    yield
+    teardown_databases(config, verbosity=0)
+
+
+@pytest.fixture
+def orm_db(django_database, db_path):
+    from db.transfer import transfer_legacy
+    from materials.models import Material as ORMmaterial
+    from operations.models import Operation
+    from warehouses.models import Stock, Warehouse as ORMwarehouse
+
+    def clear():
+        for model in (Operation, Stock, ORMmaterial, ORMwarehouse):
+            model.objects.all().delete()
+
+    clear()
+    transfer_legacy(db_path)
+    yield
+    clear()

@@ -9,26 +9,30 @@
         остаётся в истории, но на остатки уже не влияет.
     </p>
 
-    <nav class="type-filter mt-4" aria-label="Тип операции">
-        <a
-            href="{% url 'operations:list' %}"
-            {% if not current_type %}aria-current="page"{% endif %}
-        >Все</a>
-        {% for type_code, title in titles.items %}
-            <a
-                href="{% url 'operations:list' %}?type={{ type_code }}"
-                {% if type_code == current_type %}aria-current="page"{% endif %}
-            >{{ title }}</a>
-        {% endfor %}
-    </nav>
-
-    <div class="sheet-tools">
-        <span>Показано операций: {{ operations|length }}</span>
-        <label>
-            <input type="checkbox" class="form-check-input" id="hide-cancelled">
-            Скрыть отменённые
-        </label>
-    </div>
+    <form method="get" class="panel search-form mt-3">
+        <label>Материал или склад <input name="q" value="{{ query }}" class="form-control"></label>
+        <label>Тип <select name="type" class="form-select">
+            <option value="">Все</option>
+            {% for code, title in titles.items %}<option value="{{ code }}" {% if current_type == code %}selected{% endif %}>{{ title }}</option>{% endfor %}
+        </select></label>
+        <label>Склад <select name="warehouse" class="form-select">
+            <option value="">Все</option>
+            {% for w in warehouses %}<option value="{{ w.id }}" {% if warehouse_id == w.id %}selected{% endif %}>{{ w.name }}</option>{% endfor %}
+        </select></label>
+        <label>С даты <input type="date" name="from" value="{{ date_from }}" class="form-control"></label>
+        <label>По дату <input type="date" name="to" value="{{ date_to }}" class="form-control"></label>
+        <label>Порядок <select name="sort" class="form-select">
+            <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Сначала новые</option>
+            <option value="oldest" {% if sort == 'oldest' %}selected{% endif %}>Сначала старые</option>
+            <option value="material" {% if sort == 'material' %}selected{% endif %}>По материалу</option>
+            <option value="quantity" {% if sort == 'quantity' %}selected{% endif %}>По количеству</option>
+        </select></label>
+        <label><input type="checkbox" name="hide_cancelled" value="1" {% if hide_cancelled %}checked{% endif %}> Скрыть отменённые</label>
+        <button class="btn btn-primary">Применить</button>
+        <a href="{% url 'operations:list' %}">Сбросить</a>
+    </form>
+    {% for error in errors %}<p role="alert">{{ error }}</p>{% endfor %}
+    <div class="sheet-tools"><span>Показано операций: {{ operations|length }}. Всего: {{ page_obj.paginator.count }}</span></div>
 
     <div class="table-wrap">
         <table class="sheet">
@@ -62,4 +66,5 @@
             </tbody>
         </table>
     </div>
+    {% include "includes/pagination.html" %}
 {% endblock %}

@@ -1,13 +1,9 @@
-from contextlib import closing
-
 import pytest
 from django.test import Client, override_settings
 
-from db.database import create_schema, get_connection
-
 
 @pytest.fixture
-def client(db_path):
+def client(orm_db):
     return Client()
 
 
@@ -117,11 +113,13 @@ def test_navigation_uses_named_urls(client):
     assert "homepage/js/main.js" in html
 
 
-def test_empty_database(tmp_path, monkeypatch):
-    path = tmp_path / "empty.sqlite"
-    with closing(get_connection(path)) as conn:
-        create_schema(conn)
-    monkeypatch.setattr("db.database.DB_PATH", path)
+def test_empty_database(orm_db):
+    from materials.models import Material
+    from operations.models import Operation
+    from warehouses.models import Stock, Warehouse
+
+    for model in (Operation, Stock, Material, Warehouse):
+        model.objects.all().delete()
     client = Client()
     assert "Материалов пока нет" in client.get("/materials/").content.decode()
     assert "Операций пока нет" in client.get("/operations/").content.decode()

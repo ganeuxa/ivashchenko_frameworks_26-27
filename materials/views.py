@@ -1,37 +1,43 @@
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from db.queries import fetch_all, fetch_one, with_dates, with_gauge
+from db import orm
+from materials.models import Material
+from django.db.models import Q
 from models.stock import get_stock_status, stock_gauge
 from utils import parse_int
 
 
 def materials(request: HttpRequest) -> HttpResponse:
     """Список материалов с общим остатком из базы."""
-    context = {"rows": with_gauge(fetch_all("materials_with_totals"))}
+    query = request.GET.get("q", "").strip()
+    rows = orm.materials_with_totals()
+    if query:
+        rows = rows.filter(Q(name__icontains=query) | Q(unit__icontains=query))
+    context = {"rows": orm.material_rows(rows), "query": query}
     return render(request, "materials/material_list.html", context)
 
 
 def material_detail(request: HttpRequest, material_id: int) -> HttpResponse:
     """Карточка материала: остатки по складам и операции."""
-    material = fetch_one("material_by_id", [material_id])
+    material = Material.objects.filter(pk=material_id).first()
     context: dict[str, object] = {
         "material": material,
         "material_id": material_id,
     }
     if material is not None:
-        stock_items = fetch_all("material_stock", [material_id])
+        stock_items = orm.material_stock(material_id)
         total = sum(item["quantity"] for item in stock_items)
         context["row"] = {
-            **dict(material),
+            "id": material.id, "min_balance": material.min_balance,
             "total": total,
-            **stock_gauge(total, material["min_balance"]),
+            **stock_gauge(total, material.min_balance),
         }
-        context["status"] = get_stock_status(total, material["min_balance"])
+        context["status"] = get_stock_status(total, material.min_balance)
         context["stock_items"] = stock_items
-        context["operations"] = with_dates(
-            fetch_all("material_operations", [material_id])
-        )
+        context["operations"] = orm.related_operations().filter(
+            material_id=material_id,
+        ).order_by("performed_at", "id")
     return render(
         request,
         "materials/material_detail.html",
@@ -48,13 +54,11 @@ def find_warehouse(request: HttpRequest) -> HttpResponse:
     material = None
     warehouses = []
     if material_id and quantity:
-        material = fetch_one("material_by_id", [material_id])
+        material = Material.objects.filter(pk=material_id).first()
         if material is not None:
-            warehouses = fetch_all(
-                "warehouses_with_quantity", [material_id, quantity]
-            )
+            warehouses = orm.available_warehouses(material_id, quantity)
     context = {
-        "materials": fetch_all("materials_list"),
+        "materials": Material.objects.values("id", "name", "unit"),
         "material_id": material_id,
         "quantity": quantity,
         "searched": searched,

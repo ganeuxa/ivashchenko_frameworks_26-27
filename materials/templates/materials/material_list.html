@@ -10,6 +10,12 @@
         <a href="{% url 'materials:find' %}">Найти склад с нужным количеством</a>
     </p>
 
+    <form method="get" class="panel search-form mt-3">
+        <label>Название или единица измерения
+            <input name="q" value="{{ query }}" class="form-control">
+        </label>
+        <button class="btn btn-primary">Найти</button>
+    </form>
     <ul class="ledger mt-4">
         {% for row in rows %}
             {% include "materials/includes/material_row.html" %}

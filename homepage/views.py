@@ -1,14 +1,14 @@
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from db.queries import fetch_all, fetch_one, with_gauge
+from db import orm
 
 
 def index(request: HttpRequest) -> HttpResponse:
     """Главная: что пора дозаказать и короткая сводка из базы."""
     context = {
-        "summary": fetch_one("summary_counts"),
-        "shortages": with_gauge(fetch_all("low_stock")),
+        "summary": orm.summary(),
+        "shortages": orm.shortages(),
     }
     return render(request, "homepage/index.html", context)
 
